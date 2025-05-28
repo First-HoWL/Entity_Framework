@@ -14,9 +14,10 @@ namespace Game
         public int Id { get; set; }
         public string Name { get; set; }
         public Group groupe { get; set; } = new Group { Id = 0, Name = "P00" };
+        public double Avg { get; set; }
         public override string ToString()
         {
-            return $"{Id,5} | {Name,10} | {groupe}";
+            return $"{Id,5} | {Name,10} | {Math.Round(Avg, 2), 6} | {groupe}";
         }
     }
     public class Group
@@ -64,18 +65,6 @@ namespace Game
 
     }
 
-    /*
-    
-    Змінити базу даних наступним чином:
-    1. Додати таблицю викладачів
-    2. Додати в клас групи властивість "куратор" (викладач, який курує групу)
- 
-    Додати нові дані (викладачів та кураторів груп).
- 
-    Написати програму, яка дає можливість користувачу ввести прізвище викладача, після чого
-    програма повертає студентів, яких курує вказаний викладач. Якщо таких студентів немає, то
-    програма має вивести про це повідомлення.
-    */
 
 
     class ConsoleWindow
@@ -319,10 +308,17 @@ namespace Game
 
         }
 
-        static ConsoleWindow Window2 = new ConsoleWindow(new Point(40, 0), new Point(110, 25), lockObj, new object(), ConsoleColor.White, ConsoleColor.Green);
-        static ConsoleWindow Window1 = new ConsoleWindow(new Point(0, 0), new Point(38, 25), lockObj, new object(), ConsoleColor.Black, ConsoleColor.Yellow);
+        static ConsoleWindow Window2 = new ConsoleWindow(new Point(35, 0), new Point(115, 25), lockObj, new object(), ConsoleColor.White, ConsoleColor.Green);
+        static ConsoleWindow Window1 = new ConsoleWindow(new Point(0, 0), new Point(33, 25), lockObj, new object(), ConsoleColor.Black, ConsoleColor.Yellow);
 
 
+        static Random rnd = new Random();
+
+
+        public static double RandomAvg()
+        {
+            return rnd.Next(1, 11) + rnd.NextDouble();
+        }
 
         static void Main(string[] args)
         {
@@ -347,7 +343,7 @@ namespace Game
 
 
 
-
+            
 
             using (var context = new UniversityContext())
             {
@@ -355,17 +351,12 @@ namespace Game
 
                 var groups = context.Groups.ToList();
                 var teachers = context.Teachers.ToList();
-                List<string> TeahersNames = new List<string>();
-                foreach (var tracher in teachers)
-                {
-                    TeahersNames.Add(tracher.Name);
-                }
-                int a = (int)Menu(TeahersNames) + 1;
+                
 
-                var students = context.Students.Include(s => s.groupe).Where(s => s.groupe.Curator.Id == a);
+
+                var students = context.Students.Include(s => s.groupe).OrderByDescending(s => s.Avg).Take(Convert.ToInt32(context.Students.Count() * 0.45));
                 Window2.WriteLine("Students:");
-                Window2.WriteLine(string.Join("\n", students) == "" ? "    none" : string.Join("\n", students));
-                //context.Teachers.Add(new Teacher { Name = "player2", SecondName = "none" });
+                Window2.WriteLine(string.Join("\n", students));
 
                 context.SaveChanges();
 
