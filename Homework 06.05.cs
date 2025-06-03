@@ -248,6 +248,7 @@ namespace Game
 
     class Program
     {
+        static readonly object lockObj = new object();
         static ConsoleWindow Window2 = new ConsoleWindow(new Point(35, 0), new Point(115, 25), lockObj, new object(), ConsoleColor.White, ConsoleColor.Green);
         static ConsoleWindow Window1 = new ConsoleWindow(new Point(0, 0), new Point(33, 25), lockObj, new object(), ConsoleColor.Black, ConsoleColor.Yellow);
 
